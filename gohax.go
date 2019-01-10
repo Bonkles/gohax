@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -52,7 +53,22 @@ func GetPartners() {
 			fmt.Printf("Something went wrong while parsing the body of the request. HTTP response object raw format: %+v", getResp)
 			os.Exit(2)
 		}
-		fmt.Println("GET body is as follows: ", respBodyString)
+		//fmt.Println("GET body is as follows: ", respBodyString)
 	}
 
+	//Allocate some memories for what we're gonna unmarshal.
+	var partnerResponseList Partners
+	bodyBytes := []byte(respBodyString)
+
+	//Convert the body bytestream into our object instance so that we can operate on it.
+	unmarshalErr := json.Unmarshal(bodyBytes, &partnerResponseList)
+
+	if unmarshalErr != nil {
+		fmt.Println("Error occurred while unmarshalling the JSON into an object. Bailing out.")
+		os.Exit(3)
+	}
+
+	for index, partner := range partnerResponseList.Partners {
+		fmt.Printf("Partner %d:\n %+v\n", index, partner)
+	}
 }
