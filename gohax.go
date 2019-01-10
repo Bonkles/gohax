@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -40,7 +41,18 @@ func GetPartners() {
 	}
 	defer getResp.Body.Close()
 
+	var respBodyString string
 	if getResp.StatusCode == http.StatusOK {
 		fmt.Println("We successfully got something!")
+		getRespBody, bodyParseErr := ioutil.ReadAll(getResp.Body)
+
+		respBodyString = string(getRespBody)
+
+		if bodyParseErr != nil {
+			fmt.Printf("Something went wrong while parsing the body of the request. HTTP response object raw format: %+v", getResp)
+			os.Exit(2)
+		}
+		fmt.Println("GET body is as follows: ", respBodyString)
 	}
+
 }
