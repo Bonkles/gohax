@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
 )
 
 func main() {
@@ -29,4 +31,16 @@ type Partners struct {
 func GetPartners() {
 	fmt.Println("About to issue GET request to the hubteam server at URL: ", getUrl)
 
+	getResp, err := http.Get(getUrl)
+
+	if err != nil {
+		//Woops. Something went wrong.
+		println("Flagrant error! COuldn't GET that URL properly.")
+		os.Exit(1)
+	}
+	defer getResp.Body.Close()
+
+	if getResp.StatusCode == http.StatusOK {
+		fmt.Println("We successfully got something!")
+	}
 }
