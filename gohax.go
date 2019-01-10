@@ -12,7 +12,7 @@ func main() {
 	GetPartners()
 }
 
-var getUrl = "http://https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=ccbae50eb46fe5cc58ff2d925903"
+var getUrl = "https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=ccbae50eb46fe5cc58ff2d925903"
 
 //This struct will represent every element in the GET response list.
 type Partner struct {
@@ -35,7 +35,7 @@ func GetPartners() {
 
 	if err != nil {
 		//Woops. Something went wrong.
-		println("Flagrant error! COuldn't GET that URL properly.")
+		println("Flagrant error! Couldn't GET that URL properly.")
 		os.Exit(1)
 	}
 	defer getResp.Body.Close()
