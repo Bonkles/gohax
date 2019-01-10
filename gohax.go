@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -14,15 +15,35 @@ func main() {
 	GetPartners()
 }
 
+//This function converts a dateString into an actual golang date object.
+func stringToDateTime(dateString string) time.Time {
+	dateFormat := "2006-01-02" //Do not edit. This is the EXACT canonical go date for formatting.
+	date, _ := time.Parse(dateFormat, dateString)
+
+	return date
+}
+
 var getUrl = "https://candidate.hubteam.com/candidateTest/v3/problem/dataset?userKey=ccbae50eb46fe5cc58ff2d925903"
+
+func parseDates(partner *Partner) {
+
+	partner.AvailableDates = make([]time.Time, len(partner.AvailableDateStrings))
+	var time time.Time
+	for index, dateString := range partner.AvailableDateStrings {
+		time = stringToDateTime(dateString)
+		partner.AvailableDates[index] = time
+	}
+
+}
 
 //This struct will represent every element in the GET response list.
 type Partner struct {
-	FirstName      string   `json:"firstName"`
-	LastName       string   `json:"lastName"`
-	Email          string   `json:"email"`
-	Country        string   `json:"country"`
-	AvailableDates []string `json:"availableDates"`
+	FirstName            string      `json:"firstName"`
+	LastName             string      `json:"lastName"`
+	Email                string      `json:"email"`
+	Country              string      `json:"country"`
+	AvailableDateStrings []string    `json:"availableDates"`
+	AvailableDates       []time.Time //We'll fill this one in later in post-processing. :)
 }
 
 //This struct is for the entire list response.
@@ -30,7 +51,7 @@ type Partners struct {
 	Partners []Partner `json:"partners"`
 }
 
-func GetPartners() {
+func GetPartners() Partners {
 	fmt.Println("About to issue GET request to the hubteam server at URL: ", getUrl)
 
 	getResp, err := http.Get(getUrl)
@@ -69,6 +90,9 @@ func GetPartners() {
 	}
 
 	for index, partner := range partnerResponseList.Partners {
+		parseDates(&partner)
 		fmt.Printf("Partner %d:\n %+v\n", index, partner)
 	}
+
+	return partnerResponseList
 }
